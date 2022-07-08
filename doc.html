@@ -46,11 +46,34 @@ both service consumers or service provider implementors:
     - GeoJSON specifications (<a href="https://geojson.org/">https://geojson.org/</a>)
     - GeoPackage specifications (<a href="https://www.geopackage.org/">https://www.geopackage.org/</a>)
 </pre>
-<h2>4 irrigation_advisor Usage Scenarios</h2>
+<h2>4 The Advisor Lifecycle</h2>
+
+irrigation_advisor is an "advisor-type" service template. While irrigation may involve an FMIS and the ATLAS Equipment Centre like other advisors, irrigation is often managed via a dedicated Irrigation Management System. Despite this difference, the communication flows remain similar.
+
+<img src="doc/advisor_pattern.png" style="width: 420px" />
+<img src="doc/irrigation_management_system.png" style="width: 420px" />
+
+The high level flow is: prepare an advice for a farming operation => submit a task with the advice and the equipment that it should be carried with => retrieve the application map from the advice just before sending it to the equipment => carry out the task with the equipment on the field => retrieve the "as applied" information from the equipment and record it on the field_data service
+
+The ADIS will usually have a mirror copy of the fields, preloaded from a field_data service.
+
+If the monitoring functionality is supported by an advisor, in a setup phase, the ADIS may activate the monitoring of a field, providing a notification url. In the operation phase, the ADIS may either poll for recommendations or receive notifications with recommendations from the advisor (see Dynamic Behaviour). The advisor service must be paired with the requested field's field_data service in order to retrieve the field's boundaries and any other information that may be relevant (crop, previous applications, ...)
+
+The ADIS may use recommendations (recommendations are specific to the type of advisor) as the basis of an advice preparation or it may manually decide to prepare an advice based on its own criteria (2).
+
+Depending on service implementations, advice preparations could take milliseconds to hours (in some cases, weeks) to complete. The ADIS will have to either poll the advisor or register a notification_url in the preparation request to determine when an advice is completed and a task may be created (see Dynamic Behaviour).
+
+As an advice is ready, the ADIS will usually let the user select an equipment out of the ones he owns (3) and then submits a task to the ATLAS Equipment Centre, with the advice and the selected equipment as parameters (4). The task is recorded by the ATLAS Equipment Centre but may take an unknown amount of time before it is actually carried out.
+
+When the ATLAS Equipment Centre determines that a task is ready to be executed (available worker and equipment), it retrieves the application map (5), just before starting the task, giving the advisor the opportunity to update potentially pre-computed maps taking latest information (weather, new applications, ...) into account. That information is sent to the tractor (6), and eventually, "as applied" information is sent back (7) to the ATLAS Equipment Centre which then records the application on the appropriate field_data service (8). Note that results may be partial, resulting in multiple applications for a single task.
+
+When the task is finished, it is marked as completed, and a notification is sent back to the ADIS (9), but only if it provided a notification URL. Note that when a notification URL is provided with the task, notifications will also be changed for any status change.
+
+<h2>5 irrigation_advisor Usage Scenarios</h2>
 
 The following sections describe some aspects of the use of irrigation_advisor. The examples were chosen to illustrate the basic operation of applications using irrigation_advisor, not to limit what irrigation_advisor may be used for.
 
-<h2>4.1 Vineyard Irrigation</h2>
+<h2>5.1 Vineyard Irrigation</h2>
 
 Wine grape vines are a delicate crop, that can produce new vegetation and ripening grapes at the same time, with substantially different water needs during its’ various growing stages.
 
@@ -60,12 +83,12 @@ The service receives initially a request to prepare an irrigation application ma
 
 The irrigation map is delivered on an irrigation management application vendor that is responsible (a) to convert the irrigation plan data to a format understandable by the equipment that will perform the irrigation application;(b) send the implemented irrigation application map to the
 
-<h2>4.2 Tractor Irrigation</h2>
+<h2>5.2 Tractor Irrigation</h2>
 
 SOME TEXT NEEDED HERE (or remove the entire section)
 <img src="doc/advisor_pattern.png" style="width: 420px" />
 
-<h2>5 Service Template API Overview</h2>
+<h2>6 Service Template API Overview</h2>
 
 This section provides a very high-level summary of the irrigation_advisor API:
 <pre>
@@ -96,11 +119,11 @@ Only the most meaningful parameters are discussed in this document. Please refer
 
 irrigation_advisor services are not required to handle intense traffic from a single client, such as the one that may result from being directly invoked on user interface interactions in an FMIS, for instance. Implementors MAY generate a 429 TOO MANY REQUESTS error response if the rate of calls exceed some pre-defined quota.
 
-<h2>5.1 Irrigation Monitoring Endpoints</h2>
+<h2>6.1 Irrigation Monitoring Endpoints</h2>
 
 These functions relate to registering, and unregistering fields for which alerts are desired. irrigation_advisor services may provide the means to actively monitor fields and generate alerts when an irrigation application is recommended.
 
-<h2>5.1.1 Monitor Field</h2>
+<h2>6.1.1 Monitor Field</h2>
 
 This endpoint registers a field to be monitored by the irrigation_advisor. On a successful registration, irrigation_advisor will monitor the depletion levels within plants’ root zone and proactively suggest an irrigation application when a certain depletion threshold is about to be reached.
 <pre>
@@ -117,7 +140,7 @@ NOTE: an irrigation_advisor service MAY not support field monitoring. In that ca
 
 See Irrigation Monitoring for details on the monitoring notification process.
 
-<h2>5.1.2 Get monitoring recommendations</h2>
+<h2>6.1.2 Get monitoring recommendations</h2>
 
 This endpoint returns the monitoring recommendations for a field, that is whether an irrigation_advisor proactively recommends an irrigation to be applied on a monitored field.
 <pre>
@@ -133,7 +156,7 @@ The status may be one of IN_PROGRESS, CONFIGURATION_REQUIRED, READY, FAILED. In 
 
 If the status is READY then there may be one or more recommendations, to perform irrigation for the monitored field.
 
-<h2>5.1.3 Unmonitor field</h2>
+<h2>6.1.3 Unmonitor field</h2>
 
 This endpoint cancels monitoring for a field.
 <pre>
@@ -145,11 +168,11 @@ This endpoint cancels monitoring for a field.
 |     Outputs |                              |
 +-------------+------------------------------+
 </pre>
-<h2>5.2 Advice Endpoints</h2>
+<h2>6.2 Advice Endpoints</h2>
 
 These endpoints relate to the creation of irrigation advices. An advice may be requested to plan and optimize irrigation application for a specific date.
 
-<h2>5.2.1 Prepare Advice</h2>
+<h2>6.2.1 Prepare Advice</h2>
 
 This endpoint is used to request an advice to be prepared for a specific application date.
 <pre>
@@ -165,7 +188,7 @@ irrigation_advisor services may retrieve any relevant information for preparing 
 
 Advice preparation may be a lengthy process. Clients may either poll or request to be notified to determine that the advice is READY (see Advice Preparation).
 
-<h2>5.2.2 Get Advice Info</h2>
+<h2>6.2.2 Get Advice Info</h2>
 
 This function returns status information about an advice.
 <pre>
@@ -179,7 +202,7 @@ This function returns status information about an advice.
 </pre>
 In addition to the information submitted when preparing the advice, the advice info also contains a status about the advice preparation which is one of IN_PROGRESS, CONFIGURATION_REQUIRED, READY, FAILED. In this context, the IN_PROGRESS status indicates that some background processing is still being carried out and that the advice is not yet. The CONFIGURATION_REQUIRED status indicates that the end-user is required to perform some manual configuration on the service’s proprietary UI in order to enable the completion of the requested advice.
 
-<h2>5.2.3 Cancel Advice</h2>
+<h2>6.2.3 Cancel Advice</h2>
 <pre>
 +--------------------------------------------+
 | cancel_advice                              |
@@ -191,7 +214,7 @@ In addition to the information submitted when preparing the advice, the advice i
 </pre>
 Invoking this endpoint causes the advice status to become FAILED. If an advice that is not yet in READY state is cancelled and if a notification URL was provided in the prepare_advice request, a notification MUST be dispatched.
 
-<h2>5.2.4 Get Application Info</h2>
+<h2>6.2.4 Get Application Info</h2>
 
 This endpoint may only be performed on advices whose status is READY. It returns a download URL to the application map and the total estimated amount of water needed carry out the application.
 <pre>
@@ -209,11 +232,11 @@ The status may be one of IN_PROGRESS, CONFIGURATION_REQUIRED, READY, FAILED. In 
 
 For maximum accuracy, the application map is requested in a "just-in-time" fashion by the ATLAS Equipment Centre (or any other consumer) to give an opportunity to advisors to make adjustments to their pre-computed preparation. However, since this information is usually requested just as farmers are about to go out on the field to perform a task, it is important that it is computed in a short time (maximum, few seconds). Any potentially time-consuming processing must be pre-computed and cached internally during the registration and/or preparation stages.
 
-<h2>6 Data Formats</h2>
+<h2>7 Data Formats</h2>
 
 This section focuses on the description of binary (file) data formats. Please refer to the irrigation_advisor OpenAPI specifications for details on all other payload and parameter descriptions.
 
-<h2>6.1	Irrigation Application File Format</h2>
+<h2>7.1	Irrigation Application File Format</h2>
 
 Nutrient Application data MUST be in GeoPackage (<a href="https://www.geopackage.org">https://www.geopackage.org</a>) format version 1.2 or newer.
 <pre>
@@ -351,7 +374,7 @@ Irrigation "application_info.info" is a JSON object serialized as a string, such
 </pre>
 The units of the "water" data table are in m<sup>3</sup>.
 
-<h2>7 Access and Authentication</h2>
+<h2>8 Access and Authentication</h2>
 
 Farmers MUST have an account setup on an advisor service in order to authenticate and access API endpoints. The service implementor is responsible for the creation of accounts; it is not covered in the service template specifications.
 
@@ -359,21 +382,17 @@ Unless specifically documented in the OpenAPI specifications, all API calls must
 
 Some of the information held by advisor services may be considered sensitive from a GDPR perspective. The service's authorization server SHOULD request the client's end-user consent at service pairing time in order to deliver an access token.
 
-<h2>8 Dynamic Behaviour</h2>
+<h2>9 Dynamic Behaviour</h2>
 
 The purpose of the diagrams in this section is to illustrate communication patterns, more complex than plain request/response API calls, that involve several interactions and/or asynchronous behaviour. Even though a sequence diagram representation is used, the diagrams are by no means to be interpreted as UML Sequence Diagrams. Specifically, in the spirit of focusing on functional behaviour and readability, error handling is deliberately not covered in the diagrams.
 
-<h2>8.1	Irrigation Lifecycle</h2>
+The dynamic behaviour is similar for most advisor-type service templates (see The Advisor Lifecycle).
 
-The "Irrigation lifecycle" in ATLAS typically operates in a larger context involving three services and an end-user application such as an FMIS which, in collaboration, provide an end-to-end solution from algorithmically computed advices to actual operations performed on a field.
-
-<img src="doc/advisor_lifecycle.png" style="width: 420px" />
-
-<h2>8.2 Advice Preparation</h2>
+<h2>9.1 Advice Preparation</h2>
 
 There are two methods for determining whether an advice preparation has completed (successfully or unsuccessfully): by polling the advice_info endpoint or by notification.
 
-<h2>8.2.1 Polling</h2>
+<h2>9.1.1 Polling</h2>
 
 After requesting an advice preparation, the client polls the advice_info endpoint at regular intervals until the returned status is READY or FAILED.
 
@@ -381,7 +400,7 @@ The status may be CONFIGURATION_REQUIRED which indicates that a user action is r
 
 <img src="doc/advice_polling.png" style="width: 420px" />
 
-<h2>8.2.2 Notification</h2>
+<h2>9.1.2 Notification</h2>
 
 If a notification URL was supplied on the prepare_advice endpoint, it will be invoked by the advisor when the preparation status changes.
 
@@ -389,17 +408,17 @@ If a notification URL was supplied on the prepare_advice endpoint, it will be in
 
 Advisors MUST invoke the notification URL supplied by the client with an HTTPS POST command. The payload will be identical to the one that would be returned by the advice_info request.
 
-<h2>8.3 Field Monitoring</h2>
+<h2>9.2 Field Monitoring</h2>
 
 Advanced advisors have the ability to monitor conditions on fields in the background and proactively generate crop irrigation recommendations. There are two methods for determining whether recommendations are available: by polling the monitoring_info endpoint or by notification.
 
-<h2>8.3.1 Polling</h2>
+<h2>9.2.1 Polling</h2>
 
 After requesting a field to be monitored, the client polls monitoring_info endpoint at regular intervals to check whether any 'recommendations' are available.
 
 <img src="doc/monitoring_polling.png" style="width: 420px" />
 
-<h2>8.3.2 Notification</h2>
+<h2>9.2.2 Notification</h2>
 
 If a notification URL was supplied on the monitor_field endpoint, it will be invoked by the advisor when a new recommendation becomes available.
 
@@ -407,7 +426,7 @@ If a notification URL was supplied on the monitor_field endpoint, it will be inv
 
 Advisors MUST invoke the notification URL supplied by the client with an HTTPS POST command. The payload will be as defined in the OpenAPI 'Recommendation' specifications.
 
-<h2>8.4 General Comments on Notifications</h2>
+<h2>9.3 General Comments on Notifications</h2>
 
 Services must provide best efforts to deliver notifications. A notification is considered successful if the target returns an http result code 2XX.
 
