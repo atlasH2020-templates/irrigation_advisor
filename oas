@@ -303,7 +303,7 @@
                 "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                 "application": {
                   "date": "2021-07-31",
-                  "ratio": 50
+                  "ratio": 40
                 }
               }
             }
@@ -430,7 +430,7 @@
                   "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                   "application": {
                     "date": "2021-07-31T18:00:00Z",
-                    "water": 10
+                    "ratio": 50
                   },
                   "status": "READY"
                 }
@@ -590,7 +590,6 @@
                   "$ref": "#/components/schemas/ApplicationDetails"
                 },
                 "example": {
-                  "type": "irrigation",
                   "application_map": {
                     "total_amount": 20,
                     "download_url": "https://{SERVICE_BASE_URL}/some_arbitrary_path",
@@ -808,10 +807,6 @@
       "ApplicationDetails": {
         "type": "object",
         "properties": {
-          "type": {
-            "type": "string",
-            "pattern": "irrigation"
-          },
           "application_map": {
             "type": "object",
             "properties": {
@@ -839,7 +834,6 @@
           }
         },
         "required": [
-          "type",
           "application_map"
         ]
       },
