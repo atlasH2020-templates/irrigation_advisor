@@ -2,7 +2,7 @@
   "openapi": "3.0.1",
   "info": {
     "title": "ATLAS irrigation_advisor Service Template API",
-    "version": "0.1.2"
+    "version": "0.1.0"
   },
   "servers": [
     {
