@@ -302,7 +302,6 @@
               "example": {
                 "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                 "application": {
-                  "date": "2021-07-31",
                   "ratio": 40
                 }
               }
@@ -322,7 +321,6 @@
                   "type": "irrigation",
                   "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                   "application": {
-                    "date": "2021-07-31",
                     "ratio": 40
                   },
                   "status": "READY"
@@ -429,7 +427,6 @@
                   "type": "irrigation",
                   "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                   "application": {
-                    "date": "2021-07-31T18:00:00Z",
                     "ratio": 50
                   },
                   "status": "READY"
@@ -711,7 +708,6 @@
           "status": "READY",
           "recommendations": [
             {
-              "date": "2021-07-31",
               "applications": [
                 {
                   "time": "2021-07-31T10:00:00Z",
@@ -791,17 +787,12 @@
       "Application": {
         "type": "object",
         "properties": {
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
           "ratio": {
-            "type": "integer",
-            "description": "Percentage of the daily irrigation (default=100)"
+            "$ref": "#/components/schemas/Ratio"
           }
         },
         "required": [
-          "date"
+          "ratio"
         ]
       },
       "ApplicationDetails": {
@@ -840,11 +831,6 @@
       "Recommendation": {
         "type": "object",
         "properties": {
-          "date": {
-            "type": "string",
-            "format": "date",
-            "description": "Date that the irrigation should performed"
-          },
           "applications": {
             "type": "array",
             "items": {
@@ -856,8 +842,7 @@
                   "description": "Date-time that the application of water should performed. The date MUST be the same as the recommendation date"
                 },
                 "ratio": {
-                  "type": "integer",
-                  "description": "Percentage of the daily irrigation. Either all applications have a defined ratio, in which case it must total 100, or none have ratio defined in which case the distribution is assumed to be even."
+                  "$ref": "#/components/schemas/Ratio"
                 }
               },
               "required": [
@@ -868,16 +853,21 @@
           }
         },
         "example": {
-          "date": "2021-07-31",
           "applications": [
             {
-              "date_time": "2021-07-31T10:00:00Z"
+              "date_time": "2021-07-31T10:00:00Z",
+              "ratio": 30
             },
             {
-              "date_time": "2021-07-31T18:00:00Z"
+              "date_time": "2021-07-31T18:00:00Z",
+              "ration": 70
             }
           ]
         }
+      },
+      "Ratio": {
+        "type": "integer",
+        "description": "Percentage of the daily irrigation. Either all applications have a defined ratio, in which case it must total 100, or none have ratio defined in which case the distribution is assumed to be even."
       },
       "SimpleError": {
         "type": "string",
