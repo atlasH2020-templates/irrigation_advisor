@@ -44,16 +44,14 @@ A thorough understanding in the following is required for
 both service consumers or service provider implementors:
 <pre>
     - GeoJSON specifications (<a href="https://geojson.org/">https://geojson.org/</a>)
-</pre>
-<pre>
     - GeoPackage specifications (<a href="https://www.geopackage.org/">https://www.geopackage.org/</a>)
 </pre>
 
 <h2>4 The Advisor Lifecycle</h2>
 
-irrigation_advisor is an "advisor-type" service template. While irrigation may involve a Financial Management Application System (FMIS) and the ATLAS Equipment Centre like other advisors, irrigation is often managed via a dedicated Irrigation Management System. Despite this difference, the biggest part of communication flows remain similar.
+irrigation_advisor is an "advisor-type" service template. While irrigation may involve a Farm Management Application System (FMIS) and the ATLAS Equipment Centre like other advisors, irrigation is often managed via a dedicated Irrigation Management System. Despite this difference, the biggest part of communication flows remain similar.
 
-Both in the case of FMIS and irrigation management system, if the monitoring functionality is supported by an advisor, in a setup phase, the ADIS MAY activate the monitoring of a field. In the operation phase, the ADIS may either poll for recommendations or receive notifications with recommendations from the advisor (see 9.2 Field Monitoring).
+Both in the case of FMIS and irrigation management system, if the monitoring functionality is supported by an advisor, in a setup phase, the ADIS MAY activate the monitoring of a field. In the operation phase, the ADIS may either poll for recommendation or receive notifications with recommendations from the advisor (see 9.2 Field Monitoring).
 
 The advisor service must be paired with the requested field's field_data service in order to retrieve the field's boundaries and any other information that may be relevant (e.g., crop, previous applications, etc.).
 
@@ -98,7 +96,7 @@ ADIS may ask from an irrigation_advisor to promote regulated deficit irrigation 
 
 If the field monitoring functionality is supported, the irrigation_advisor service calculates the water depletion within the root zone in predefined time intervals (can vary from hourly to daily depending on the irrigation_advisor implementation), and prepare an irrigation recommendation(s) when a certain depletion criterion is met.
 
-When the advisor receives a prepare_advice request it may take into account the vines growing stage (linked to growing degree days after budburst), the soil's properties and previously applied irrigations, to determine the optimal irrigation amount, that will maintain the vineyard plants under the proper water status (e.g., well irrigated or mildly stressed). An advice preparation takes always into account the latest available data and it's validity is time-limited (see 9.1 Advice Preparation).
+When the advisor receives a prepare_advice request it may take into account the crop growing stage, the soil's properties and previously applied irrigations, to determine the optimal irrigation amount, that will maintain the crop under the proper water status (e.g., well irrigated or mildly stressed). An advice preparation takes always into account the latest available data and it's validity is time-limited (see 9.1 Advice Preparation).
 
 The irrigation map is delivered on an ADIS that is responsible to carry out the irrigation application implementation (see 4. The Advisor Lifecycle).
 
