@@ -693,7 +693,7 @@
             "type": "string",
             "description": "end-user-friendly message describing the status. In the special case where status is CONFIGURATION_REQUESTED, the message MUST be a browser URL to a configuration UI where further configuration can take place"
           },
-          "recommendations": {
+          "recommendation": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Recommendation"
@@ -702,7 +702,7 @@
         },
         "required": [
           "status",
-          "recommendations"
+          "recommendation"
         ],
         "example": {
           "status": "READY",
@@ -831,43 +831,74 @@
       "Recommendation": {
         "type": "object",
         "properties": {
-          "applications": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "date_time": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "Date-time that the application of water should performed. The date MUST be the same as the recommendation date"
-                },
-                "ratio": {
-                  "$ref": "#/components/schemas/Ratio"
-                }
-              },
-              "required": [
-                "date_time",
-                "ratio"
-              ]
-            }
+          "type": {
+            "description": "A definition of the recommendation type; could be daily or sub-daily",
+           "oneOf": [
+            "$ref": "#/components/schemas/Daily",
+            "$ref": "#/components/schemas/sub-Daily"
+          ]
           }
         },
         "example": {
-          "applications": [
-            {
-              "date_time": "2021-07-31T10:00:00Z",
-              "ratio": 30
-            },
-            {
-              "date_time": "2021-07-31T18:00:00Z",
-              "ration": 70
+          "recommendation":
+          {
+            "type": {
+              "daily": {
+               "earliest": "2021-07-30",
+               "latest": "2021-07-31",
+               "applications": 2
+              }
             }
+          }
+        },
+        "required":[
+          "type",
+          "earliest",
+          "latest",
+          "time"
           ]
-        }
+      },
+      "Daily": {
+        "type": "object",
+        "properties": {
+         "earliest": {
+            "type": "string",
+            "format": "date",
+            "description": "The first date of the time-window that an irrigation application should be applied."
+          },
+          "latest": {
+            "type": "string",
+            "format": "date",
+            "description": "the last date of the time-window that an irrigation application should be applied."
+          },
+         "applications": {
+            "type": "integer",
+            "description": "An optional parameter that refers to the number of applications an irrigation system must perform to implement an irrigation application. Usefull for irrigation_advisor services that integrate info related to irrigation systems capacity. Default is equal to 1"
+          }
+       },
+       "description": "A recommedation for an irrigation application that could be applied within a time interval of 1 or more days without adverse effects for the crop",
+       "required": [
+         "earliest",
+         "latest"
+         ]
+      },
+      "sub-Daily": {
+        'type': "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "the time that an irrigation implementation task should be implemented."
+          }
+        },
+        "description": "A recommedation for an irrigation application that is time intensive and usually a delay of dome hours may have adverse effects on crop",
+        "required": [
+          "time"
+          ]
       },
       "Ratio": {
         "type": "integer",
-        "description": "Percentage of the daily irrigation. Either all applications have a defined ratio, in which case it must total 100, or none have ratio defined in which case the distribution is assumed to be even."
+        "description": "The percentage of the remaining daily requirements."
       },
       "SimpleError": {
         "type": "string",
