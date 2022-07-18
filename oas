@@ -107,7 +107,7 @@
         "tags": [
           "Monitoring"
         ],
-        "summary": "Retrieve field monitoring recommendations (monitoring_info)",
+        "summary": "Retrieve field monitoring recommendation (monitoring_info)",
         "parameters": [
           {
             "description": "the URN of a monitored field (urn:<field_service_id>:<internal_id>)",
@@ -302,7 +302,6 @@
               "example": {
                 "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                 "application": {
-                  "date": "2021-07-31",
                   "ratio": 40
                 }
               }
@@ -322,7 +321,6 @@
                   "type": "irrigation",
                   "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                   "application": {
-                    "date": "2021-07-31",
                     "ratio": 40
                   },
                   "status": "READY"
@@ -429,7 +427,6 @@
                   "type": "irrigation",
                   "field_urn": "urn:com.envrio-land.atlas.field_data:fdbe6f55-6179-4b88-9177-4afbed33adac",
                   "application": {
-                    "date": "2021-07-31T18:00:00Z",
                     "ratio": 50
                   },
                   "status": "READY"
@@ -696,7 +693,7 @@
             "type": "string",
             "description": "end-user-friendly message describing the status. In the special case where status is CONFIGURATION_REQUESTED, the message MUST be a browser URL to a configuration UI where further configuration can take place"
           },
-          "recommendations": {
+          "recommendation": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Recommendation"
@@ -705,25 +702,19 @@
         },
         "required": [
           "status",
-          "recommendations"
+          "recommendation"
         ],
         "example": {
           "status": "READY",
-          "recommendations": [
-            {
-              "date": "2021-07-31",
-              "applications": [
-                {
-                  "time": "2021-07-31T10:00:00Z",
-                  "ratio": 40
-                },
-                {
-                  "time": "2021-07-31T18:00:00Z",
-                  "ratio": 60
-                }
-              ]
+          "recommendation": {
+            "type": {
+              "daily": {
+               "earliest": "2021-07-30",
+               "latest": "2021-07-31",
+               "applications": 2
+              }
             }
-          ]
+          }
         }
       },
       "AdviceRequest": {
@@ -791,17 +782,12 @@
       "Application": {
         "type": "object",
         "properties": {
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
           "ratio": {
-            "type": "integer",
-            "description": "Percentage of the daily irrigation (default=100)"
+            "$ref": "#/components/schemas/Ratio"
           }
         },
         "required": [
-          "date"
+          "ratio"
         ]
       },
       "ApplicationDetails": {
@@ -839,45 +825,76 @@
       },
       "Recommendation": {
         "type": "object",
+        "description": "A recommendation about when the next irrigation application should be implemented. Depending on crop sensitivity to water stress it could be a time-window of few days or a specific time",
         "properties": {
-          "date": {
-            "type": "string",
-            "format": "date",
-            "description": "Date that the irrigation should performed"
-          },
-          "applications": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "date_time": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "Date-time that the application of water should performed. The date MUST be the same as the recommendation date"
-                },
-                "ratio": {
-                  "type": "integer",
-                  "description": "Percentage of the daily irrigation. Either all applications have a defined ratio, in which case it must total 100, or none have ratio defined in which case the distribution is assumed to be even."
-                }
-              },
-              "required": [
-                "date_time",
-                "ratio"
-              ]
-            }
+          "type": {
+            "description": "A definition of the recommendation type; could be daily or sub-daily",
+           "oneOf": [
+            "$ref": "#/components/schemas/Daily",
+            "$ref": "#/components/schemas/sub-Daily"
+          ]
           }
         },
         "example": {
-          "date": "2021-07-31",
-          "applications": [
-            {
-              "date_time": "2021-07-31T10:00:00Z"
-            },
-            {
-              "date_time": "2021-07-31T18:00:00Z"
+          "recommendation":
+          {
+            "type": {
+              "daily": {
+               "earliest": "2021-07-30",
+               "latest": "2021-07-31",
+               "applications": 2
+              }
             }
+          }
+        },
+        "required":[
+          "type",
+          "earliest",
+          "latest",
+          "time"
           ]
-        }
+      },
+      "Daily": {
+        "type": "object",
+        "properties": {
+         "earliest": {
+            "type": "string",
+            "format": "date",
+            "description": "The first date of the time-window that an irrigation application should be applied."
+          },
+          "latest": {
+            "type": "string",
+            "format": "date",
+            "description": "the last date of the time-window that an irrigation application should be applied."
+          },
+         "applications": {
+            "type": "integer",
+            "description": "An optional parameter that refers to the number of applications an irrigation system must perform to implement an irrigation application. Usefull for irrigation_advisor services that integrate info related to irrigation systems capacity. Default is equal to 1"
+          }
+       },
+       "description": "A recommedation for an irrigation application that could be applied within a time interval of 1 or more days without adverse effects for the crop",
+       "required": [
+         "earliest",
+         "latest"
+         ]
+      },
+      "sub-Daily": {
+        'type': "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "the time that an irrigation implementation task should be implemented."
+          }
+        },
+        "description": "A recommedation for an irrigation application that is time intensive and usually a delay of dome hours may have adverse effects on crop",
+        "required": [
+          "time"
+          ]
+      },
+      "Ratio": {
+        "type": "integer",
+        "description": "The percentage of the remaining daily requirements."
       },
       "SimpleError": {
         "type": "string",

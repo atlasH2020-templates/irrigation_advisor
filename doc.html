@@ -20,15 +20,15 @@ Author(s)        I.D. Tsakmakis, V. Pisinaras, C. Brogi (LRI,FZJ)
 <div style="margin-left: -22px;">
 Abstract
 
-This document describes the specifications for irrigation_advisor services whose purpose is to provide an irrigation map, for a selected field and a specific application date. irrigation_advisor services are not obligated to take into consideration the water supply system infrastructure (main and lateral pipelines or canals etc.) or the equipment that will implement the suggested irrigation (drip, sprinkler, micro-sprinkler etc.). They may be based on soil water balance equations and/or crop models of varying complexity levels (from empirical to mechanistic), that are fed with data related to plant-soil-atmosphere-water continuum and derive estimations of the required net irrigation amount. The latter can be used successively by an irrigation management application vendor.
+This document describes the specifications for irrigation_advisor services whose purpose is to provide an irrigation map for a selected field. irrigation_advisor services are not obligated to take into consideration the water supply system infrastructure (main and lateral pipelines or canals etc.) or the equipment that will implement the suggested irrigation (drip, sprinkler, micro-sprinkler etc.), but that's not prohibit individual implementations to include such inputs. They may be based on soil water balance equations and/or crop models of varying complexity levels (from empirical to mechanistic), that are fed with data related to plant-soil-atmosphere-water continuum and derive estimations of the required net irrigation amount. The latter can be used successively by an irrigation management application vendor.
 </div>
 <h2>1 Introduction</h2>
 
 Shortage of plant available water may strongly reduce crop yield or cause crop production failure. Thus, in certain regions and for certain cultivations, irrigation is essential to achieve optimum crop yield. However, the “when” and “how much” to irrigate may vary significantly depending on crop variety, soil characteristics, local weather conditions, and on the existing soil water amount available for the plant.
 
-An irrigation_advisor service determines the amount of water that is required to maintain the water levels within the rooting zone profile in satisfactory levels. This amount should not be miss-interpreted as the water needed to refill rooting zone back to field capacity. The satisfactory levels may vary significantly depending on crop type, crop different growing stages, or the implemented irrigation strategies’ scope: "no-water-stress", "regulated-mild water stress", "regulated-severe water stress", "sustained water stress" etc.
+An irrigation_advisor service may (a) recommends when a selected field should be irrigated (see 9.2 Field Monitoring) and (b) determines the amount of water that should be applied on the field in order to maintain the water levels within root zone in satisfactory levels. This amount should not be miss-interpreted as the water needed to refill root zone back to field capacity. The satisfactory levels may vary significantly depending on crop type, crop different growing stages, or the implemented irrigation strategy by the irrigation management ATLAS-enabled Digital Information System (ADIS) e.g., "no-water-stress", "regulated-mild water stress", "regulated-severe water stress", "sustained water stress" etc.
 
-Farmers may use different irrigation services/options depending on the accuracy they want to achieve, their budget, or the availability of ancillary data.
+Farmers may use different irrigation_advisor implementations depending on the accuracy they want to achieve, their budget, or the availability of ancillary data.
 
 <h2>2 Terminology</h2>
 
@@ -46,28 +46,43 @@ both service consumers or service provider implementors:
     - GeoJSON specifications (<a href="https://geojson.org/">https://geojson.org/</a>)
     - GeoPackage specifications (<a href="https://www.geopackage.org/">https://www.geopackage.org/</a>)
 </pre>
+
 <h2>4 The Advisor Lifecycle</h2>
 
-irrigation_advisor is an "advisor-type" service template. While irrigation may involve an FMIS and the ATLAS Equipment Centre like other advisors, irrigation is often managed via a dedicated Irrigation Management System. Despite this difference, the communication flows remain similar.
+irrigation_advisor is an "advisor-type" service template. While irrigation may involve a Farm Management Application System (FMIS) and the ATLAS Equipment Centre like other advisors, irrigation is often managed via a dedicated Irrigation Management System. Despite this difference, the biggest part of communication flows remain similar.
 
-<img src="doc/advisor_pattern.png" style="width: 420px" />
-<img src="doc/irrigation_management_system.png" style="width: 420px" />
+Both in the case of FMIS and irrigation management system, if the monitoring functionality is supported by an advisor, in a setup phase, the ADIS MAY activate the monitoring of a field. In the operation phase, the ADIS may either poll for recommendation or receive notifications with recommendations from the advisor (see 9.2 Field Monitoring).
 
-The high level flow is: prepare an advice for a farming operation => submit a task with the advice and the equipment that it should be carried with => retrieve the application map from the advice just before sending it to the equipment => carry out the task with the equipment on the field => retrieve the "as applied" information from the equipment and record it on the field_data service
+The advisor service must be paired with the requested field's field_data service in order to retrieve the field's boundaries and any other information that may be relevant (e.g., crop, previous applications, etc.).
+
+The ADIS may use recommendations (recommendations are specific to the type of advisor) as the basis of an advice preparation or it may manually decide to prepare an advice based on its own criteria.
+
+Depending on service implementations, advice preparations could take milliseconds to hours (in some cases, weeks) to complete. The ADIS will have to either poll the advisor or register a notification_url in the preparation request to determine when an advice is completed and a task may be created (see 9.1 Advice Preparation).
 
 The ADIS will usually have a mirror copy of the fields, preloaded from a field_data service.
 
-If the monitoring functionality is supported by an advisor, in a setup phase, the ADIS may activate the monitoring of a field, providing a notification url. In the operation phase, the ADIS may either poll for recommendations or receive notifications with recommendations from the advisor (see Dynamic Behaviour). The advisor service must be paired with the requested field's field_data service in order to retrieve the field's boundaries and any other information that may be relevant (crop, previous applications, ...)
+<h2>4.1 Communication flow with a FMIS</h2>
 
-The ADIS may use recommendations (recommendations are specific to the type of advisor) as the basis of an advice preparation or it may manually decide to prepare an advice based on its own criteria (2).
+<img src="doc/advisor_pattern.png" style="width: 420px" />
 
-Depending on service implementations, advice preparations could take milliseconds to hours (in some cases, weeks) to complete. The ADIS will have to either poll the advisor or register a notification_url in the preparation request to determine when an advice is completed and a task may be created (see Dynamic Behaviour).
+In the case that a FMIS is involved the high level flow is: get a recommendation from advisor (only if the field is registered for monitoring) (1) => prepare an advice for a farming operation (2) => submit a task with the advice and the equipment that it should be carried with (4) => retrieve the application map from the advice just before sending it to the equipment (5) => carry out the task with the equipment on the field (6) => retrieve the "as applied" information from the equipment (7) and record it on the field_data service (8).
 
 As an advice is ready, the ADIS will usually let the user select an equipment out of the ones he owns (3) and then submits a task to the ATLAS Equipment Centre, with the advice and the selected equipment as parameters (4). The task is recorded by the ATLAS Equipment Centre but may take an unknown amount of time before it is actually carried out.
 
-When the ATLAS Equipment Centre determines that a task is ready to be executed (available worker and equipment), it retrieves the application map (5), just before starting the task, giving the advisor the opportunity to update potentially pre-computed maps taking latest information (weather, new applications, ...) into account. That information is sent to the tractor (6), and eventually, "as applied" information is sent back (7) to the ATLAS Equipment Centre which then records the application on the appropriate field_data service (8). Note that results may be partial, resulting in multiple applications for a single task.
+When the ATLAS Equipment Centre determines that a task is ready to be executed (available worker and equipment), it retrieves the application map (5), just before starting the task, giving the advisor the opportunity to update potentially pre-computed maps taking latest information (weather, new applications, etc.) into account. That information is sent to the tractor (or other irrigation equipment with the capability to implement the task) (6), and eventually, "as applied" information is sent back (7) to the ATLAS Equipment Centre which then records the application on the appropriate field_data service (8). Note that results may be partial, resulting in multiple applications for a single task.
 
-When the task is finished, it is marked as completed, and a notification is sent back to the ADIS (9), but only if it provided a notification URL. Note that when a notification URL is provided with the task, notifications will also be changed for any status change.
+Once the task is finished, it is marked as completed, and a notification is sent back to the ADIS (9), but only if it provided a notification URL. Note that when a notification URL is provided with the task, notifications will also be changed for any status change.
+
+<h2>4.2 Communication flow with an Irrigation Management System</h2>
+
+<img src="doc/irrigation_management_system.png" style="width: 420px" />
+
+When the irrigation application will be implemented via an irrigation management system the high level flow is: get a recommendation from advisor (only if the advisor supports recommendation feature and field is registered for monitoring) (1), prepare an advice for a farming operation (2) => retrieve the application map from the advice just before start the implementation (3) => carry out the task with the equipment on the field (4) => send the "as_applied" information to the field_data services (6).
+
+Irrigation management system vendor is responsible to prepare the equipment that will implement the irrigation application task as well as to convert the irrigation map data to a type that the equipment can understand.
+
+When the Irrigation management system vendor determines that an irrigation application task is ready to be executed (available worker and equipment), retrieves the application map (3), just before starting the task, giving the advisor the opportunity to update potentially pre-computed maps taking latest information (weather, new applications, etc.) into account. Once the task is completed irrigation manager retrives the application data from the equipment (5) and send the "as applied" information is sent back on the appropriate field_data service (6). Note that results may be partial, resulting in multiple applications for a single task.
+
 
 <h2>5 irrigation_advisor Usage Scenarios</h2>
 
@@ -77,16 +92,13 @@ The following sections describe some aspects of the use of irrigation_advisor. T
 
 Wine grape vines are a delicate crop, that can produce new vegetation and ripening grapes at the same time, with substantially different water needs during its’ various growing stages.
 
-An irrigation_advisor service can be designed to promote regulated deficit irrigation over full irrigation, in certain growing stages (e.g., veraison stage), aiming to control the vegetation growth and improve grapes quality characteristics (e.g., sugar, pH, etc.).
+ADIS may ask from an irrigation_advisor to promote regulated deficit irrigation over full irrigation, in certain growing stages (e.g., veraison stage), aiming to control the vegetation growth and improve grapes quality characteristics (e.g., sugar, pH, etc.).
 
-The service receives initially a request to prepare an irrigation application map for a vineyard plantation. Based on the vines growing stage (linked to growing degree days after budburst), the soil's properties and previously applied irrigations, the irrigation_advisor service determines the optimal irrigation amount, for a given application day, that will maintain the vineyard plants under the proper water status (e.g., well irrigated or mildly stressed).
+If the field monitoring functionality is supported, the irrigation_advisor service calculates the water depletion within the root zone in predefined time intervals (can vary from hourly to daily depending on the irrigation_advisor implementation), and prepare an irrigation recommendation(s) when a certain depletion criterion is met.
 
-The irrigation map is delivered on an irrigation management application vendor that is responsible (a) to convert the irrigation plan data to a format understandable by the equipment that will perform the irrigation application;(b) send the implemented irrigation application map to the
+When the advisor receives a prepare_advice request it may take into account the crop growing stage, the soil's properties and previously applied irrigations, to determine the optimal irrigation amount, that will maintain the crop under the proper water status (e.g., well irrigated or mildly stressed). An advice preparation takes always into account the latest available data and it's validity is time-limited (see 9.1 Advice Preparation).
 
-<h2>5.2 Tractor Irrigation</h2>
-
-SOME TEXT NEEDED HERE (or remove the entire section)
-<img src="doc/advisor_pattern.png" style="width: 420px" />
+The irrigation map is delivered on an ADIS that is responsible to carry out the irrigation application implementation (see 4. The Advisor Lifecycle).
 
 <h2>6 Service Template API Overview</h2>
 
@@ -109,10 +121,10 @@ Within this section, operations are summarised with simple tables:
 +--------------------------------------------+
 | logical operation name                     |
 +-------------+------------------------------+
-|      Inputs | &lt;URL parameters or           |
-|             | request body attributes&gt;     |
+|      Inputs | &lt;URL parameters or        |
+|             | request body attributes&gt;  |
 +-------------+------------------------------+
-|     Outputs | &lt;body attributes&gt;            |
+|     Outputs | &lt;body attributes&gt;      |
 +-------------+------------------------------+
 </pre>
 Only the most meaningful parameters are discussed in this document. Please refer to the OpenAPI specifications for full details.
@@ -179,12 +191,16 @@ This endpoint is used to request an advice to be prepared for a specific applica
 +--------------------------------------------+
 | prepare_advice                             |
 +-------------+------------------------------+
-|      Inputs | field urn, application       |
+|      Inputs | field urn, application,      |
+|             |ratio                         |  
 +-------------+------------------------------+
 |     Outputs | advice urn                   |
 +-------------+------------------------------+
 </pre>
 irrigation_advisor services may retrieve any relevant information for preparing advices from the field_data service (e.g., boundaries, current crop, previous applications, etc.). Advices should be prepared by taking the current conditions into account. Advisors have the opportunity to refine their internal recommendations at the actual time the application for the advice is requested (see Get Application Info).
+
+ratio is an irrigation_advisor specific parameter and stands for the percentage of the remaining daily requirements (after subtracting the already performed applications). For instanse (a) an advice with ratio 40 is requested. Application map is downloaded and the irrigation task for the advice completes (field_data updated) and then another advice with ratio 60 is requested. The daily amount will be 70%.
+To avoid this, after the first irrigation is completed, the second advice should be requested with ratio 100 (or not ratio specified). The daily amount will then be 100%.; (b) an advice with ratio 40 is requested and it’s application map is downloaded. Another advice for 60 is requested and application map downloaded before the first irrigation was performed. The daily amount will be 100% (offline scenario).
 
 Advice preparation may be a lengthy process. Clients may either poll or request to be notified to determine that the advice is READY (see Advice Preparation).
 
@@ -272,7 +288,7 @@ and a single row:
 +-----+----------------+----------------------------------+
 |     | type           | "irrigation"                     |
 |     +----------------+----------------------------------+
-|     | participant    | "&lt;atlas participant id&gt;"         |
+|     | participant    | "&lt;atlas participant id&gt;"   |
 |  1  +----------------+----------------------------------+
 |     | application    | "..."                            |
 |     +----------------+----------------------------------+
@@ -314,7 +330,7 @@ If the data_type of the water table is "features", then the columns must be as f
 |     +-----------------+---------------------------------+
 |     | geometry        | "GeoPackage Geometry"           |
 |     +-----------------+---------------------------------+
-|     | amount          | "amount in m<sup>3</sup> (REAL)"           |
+|     | amount          | "amount in m<sup>3</sup> (INTEGER)"        |
 |-----+-----------------+---------------------------------+
 </pre>
 Instead, if the data_type of the water table is "2d-gridded-coverage" then it must be defined as follows:
@@ -372,7 +388,8 @@ Irrigation "application_info.info" is a JSON object serialized as a string, such
 | }                                             |
 +-----------------------------------------------+
 </pre>
-The units of the "water" data table are in m<sup>3</sup>.
+
+Despite the fact that the majority of the crop models/water balance methods estimate the water inputs and outputs from the soil profile in mm, irrigation_advisor services MUST convert this ammount into m<sup>3</sup> to render application map data easier to be "read" by irrigation management ADIS. Thus, the units of the "water" and "application_info.info" table in m<sup>3</sup>.
 
 <h2>8 Access and Authentication</h2>
 
@@ -388,7 +405,12 @@ The purpose of the diagrams in this section is to illustrate communication patte
 
 The dynamic behaviour is similar for most advisor-type service templates (see The Advisor Lifecycle).
 
+
 <h2>9.1 Advice Preparation</h2>
+
+The advices prepared by the irrigation_advisor services use all the latest available data and MUST not considered as valid for an extended time interval (e.g., more than 1 day).
+
+ADIS that use irrigation_advisor services that do not support monitoring feature and ask for an advice, is RECOMMENDED to first decide the best irrigation application date-time and then ask for an advice a short time before the implementation. The correctness of the chosen date-time is exclusively ADIS responsibility.
 
 There are two methods for determining whether an advice preparation has completed (successfully or unsuccessfully): by polling the advice_info endpoint or by notification.
 
@@ -410,7 +432,11 @@ Advisors MUST invoke the notification URL supplied by the client with an HTTPS P
 
 <h2>9.2 Field Monitoring</h2>
 
-Advanced advisors have the ability to monitor conditions on fields in the background and proactively generate crop irrigation recommendations. There are two methods for determining whether recommendations are available: by polling the monitoring_info endpoint or by notification.
+Advanced advisors have the ability to monitor field water status in the background and proactively generate irrigation recommendations when a certain criterion is met. Such services integrate the aspect of time, by providing the info about when an irrigation application should occur, contributing significantly to the better management (e.g., availability of equipment and/or personnel) of an irrigation application implementation. Thus, it is highly RECOMMENDED to the irrigation_advisor implementers to integrate monitoring option to their services.
+
+Recommendation(s) could refer to an irrigation task that should be carried out within few hours or sometime within the next few days. This time window depends on the specific irrigation_advisor implementation standards.
+
+There are two methods for determining whether recommendations are available: by polling the monitoring_info endpoint or by notification.
 
 <h2>9.2.1 Polling</h2>
 
