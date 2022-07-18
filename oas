@@ -107,7 +107,7 @@
         "tags": [
           "Monitoring"
         ],
-        "summary": "Retrieve field monitoring recommendations (monitoring_info)",
+        "summary": "Retrieve field monitoring recommendation (monitoring_info)",
         "parameters": [
           {
             "description": "the URN of a monitored field (urn:<field_service_id>:<internal_id>)",
@@ -706,20 +706,15 @@
         ],
         "example": {
           "status": "READY",
-          "recommendations": [
-            {
-              "applications": [
-                {
-                  "time": "2021-07-31T10:00:00Z",
-                  "ratio": 40
-                },
-                {
-                  "time": "2021-07-31T18:00:00Z",
-                  "ratio": 60
-                }
-              ]
+          "recommendation": {
+            "type": {
+              "daily": {
+               "earliest": "2021-07-30",
+               "latest": "2021-07-31",
+               "applications": 2
+              }
             }
-          ]
+          }
         }
       },
       "AdviceRequest": {
@@ -830,6 +825,7 @@
       },
       "Recommendation": {
         "type": "object",
+        "description": "A recommendation about when the next irrigation application should be implemented. Depending on crop sensitivity to water stress it could be a time-window of few days or a specific time",
         "properties": {
           "type": {
             "description": "A definition of the recommendation type; could be daily or sub-daily",
