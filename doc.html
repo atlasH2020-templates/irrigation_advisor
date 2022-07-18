@@ -94,7 +94,7 @@ Wine grape vines are a delicate crop, that can produce new vegetation and ripeni
 
 ADIS may ask from an irrigation_advisor to promote regulated deficit irrigation over full irrigation, in certain growing stages (e.g., veraison stage), aiming to control the vegetation growth and improve grapes quality characteristics (e.g., sugar, pH, etc.).
 
-If the field monitoring functionality is supported, the irrigation_advisor service calculates the water depletion within the root zone in predefined time intervals (can vary from hourly to daily depending on the irrigation_advisor implementation), and prepare an irrigation recommendation(s) when a certain depletion criterion is met.
+If the field monitoring functionality is supported, the irrigation_advisor service calculates the water depletion within the root zone in predefined time intervals (can vary from hourly to daily depending on the irrigation_advisor implementation), and prepare an irrigation recommendation when a certain depletion criterion is met.
 
 When the advisor receives a prepare_advice request it may take into account the crop growing stage, the soil's properties and previously applied irrigations, to determine the optimal irrigation amount, that will maintain the crop under the proper water status (e.g., well irrigated or mildly stressed). An advice preparation takes always into account the latest available data and it's validity is time-limited (see 9.1 Advice Preparation).
 
@@ -142,7 +142,7 @@ This endpoint registers a field to be monitored by the irrigation_advisor. On a 
 +--------------------------------------------+
 | monitor_field                              |
 +-------------+------------------------------+
-|      Inputs | field urn, [nutrients],      |
+|      Inputs | field urn,                   |
 |             | notification url             |
 +-------------+------------------------------+
 |     Outputs | (see monitoring_info)        |
@@ -161,7 +161,7 @@ This endpoint returns the monitoring recommendations for a field, that is whethe
 +-------------+------------------------------+
 |      Inputs | field urn                    |
 +-------------+------------------------------+
-|     Outputs | status, [recommendations]    |
+|     Outputs | status, {recommendation}     |
 +-------------+------------------------------+
 </pre>
 The status may be one of IN_PROGRESS, CONFIGURATION_REQUIRED, READY, FAILED. In this context, the IN_PROGRESS status indicates that some background processing is still being carried out and that the service is not yet ready to perform active monitoring. The CONFIGURATION_REQUIRED status indicates that the end-user is required to perform some manual configuration on the service's proprietary UI. FAILED indicates that monitoring is not possible. 0 or more alerts may be present only when the status is READY.
@@ -186,20 +186,20 @@ These endpoints relate to the creation of irrigation advices. An advice may be r
 
 <h2>6.2.1 Prepare Advice</h2>
 
-This endpoint is used to request an advice to be prepared for a specific application date.
+This endpoint is used to request an advice to be prepared for a specific field.
 <pre>
 +--------------------------------------------+
 | prepare_advice                             |
 +-------------+------------------------------+
-|      Inputs | field urn, application,      |
-|             |ratio                         |  
+|      Inputs | field urn, application {     |
+|             | ratio}                       |  
 +-------------+------------------------------+
 |     Outputs | advice urn                   |
 +-------------+------------------------------+
 </pre>
-irrigation_advisor services may retrieve any relevant information for preparing advices from the field_data service (e.g., boundaries, current crop, previous applications, etc.). Advices should be prepared by taking the current conditions into account. Advisors have the opportunity to refine their internal recommendations at the actual time the application for the advice is requested (see Get Application Info).
+irrigation_advisor services may retrieve any relevant information for preparing advices from the field_data service (e.g., boundaries, current crop, previous applications, etc.). Advices should be prepared by taking the current conditions into account. Advisors have the opportunity to refine their internal recommendation at the actual time the application for the advice is requested (see Get Application Info).
 
-ratio is an irrigation_advisor specific parameter and stands for the percentage of the remaining daily requirements (after subtracting the already performed applications). For instanse (a) an advice with ratio 40 is requested. Application map is downloaded and the irrigation task for the advice completes (field_data updated) and then another advice with ratio 60 is requested. The daily amount will be 70%.
+ratio is an irrigation_advisor specific parameter and stands for the percentage of the remaining daily requirements(after subtracting the already performed applications) that the irrigation management ADIS plans to apply on the field during the next irrigation application . For instanse (a) an advice with ratio 40 is requested. Application map is downloaded and the irrigation task for the advice completes (field_data updated) and then another advice with ratio 60 is requested. The daily amount will be 70%.
 To avoid this, after the first irrigation is completed, the second advice should be requested with ratio 100 (or not ratio specified). The daily amount will then be 100%.; (b) an advice with ratio 40 is requested and it’s application map is downloaded. Another advice for 60 is requested and application map downloaded before the first irrigation was performed. The daily amount will be 100% (offline scenario).
 
 Advice preparation may be a lengthy process. Clients may either poll or request to be notified to determine that the advice is READY (see Advice Preparation).
@@ -389,7 +389,7 @@ Irrigation "application_info.info" is a JSON object serialized as a string, such
 +-----------------------------------------------+
 </pre>
 
-Despite the fact that the majority of the crop models/water balance methods estimate the water inputs and outputs from the soil profile in mm, irrigation_advisor services MUST convert this ammount into m<sup>3</sup> to render application map data easier to be "read" by irrigation management ADIS. Thus, the units of the "water" and "application_info.info" table in m<sup>3</sup>.
+Despite the fact that the majority of the crop models/water balance methods estimate the soil water balance in mm, irrigation_advisor services MUST convert this ammount into m<sup>3</sup> to render application map data easier to be "read" by irrigation management ADIS. Thus, the units of the "water" and "application_info.info" table MUST be in m<sup>3</sup>.
 
 <h2>8 Access and Authentication</h2>
 
@@ -410,7 +410,7 @@ The dynamic behaviour is similar for most advisor-type service templates (see Th
 
 The advices prepared by the irrigation_advisor services use all the latest available data and MUST not considered as valid for an extended time interval (e.g., more than 1 day).
 
-ADIS that use irrigation_advisor services that do not support monitoring feature and ask for an advice, is RECOMMENDED to first decide the best irrigation application date-time and then ask for an advice a short time before the implementation. The correctness of the chosen date-time is exclusively ADIS responsibility.
+Irrigation management ADIS that use irrigation_advisor services which do not support monitoring feature and ask for an advice, is RECOMMENDED to first decide the best irrigation application date-time and then ask for an advice a short time before the implementation. In this case the correctness of the chosen date-time is exclusively irrigation management ADIS responsibility.
 
 There are two methods for determining whether an advice preparation has completed (successfully or unsuccessfully): by polling the advice_info endpoint or by notification.
 
@@ -432,15 +432,15 @@ Advisors MUST invoke the notification URL supplied by the client with an HTTPS P
 
 <h2>9.2 Field Monitoring</h2>
 
-Advanced advisors have the ability to monitor field water status in the background and proactively generate irrigation recommendations when a certain criterion is met. Such services integrate the aspect of time, by providing the info about when an irrigation application should occur, contributing significantly to the better management (e.g., availability of equipment and/or personnel) of an irrigation application implementation. Thus, it is highly RECOMMENDED to the irrigation_advisor implementers to integrate monitoring option to their services.
+Advanced advisors have the ability to monitor field water status in the background and proactively generate irrigation recommendation when a certain criterion is met. Such services integrate the aspect of time, by providing the info about when an irrigation application should occur, contributing significantly to the better management (e.g., availability of equipment and/or personnel) of an irrigation application implementation. Thus, it is highly RECOMMENDED to the irrigation_advisor implementers to integrate monitoring option to their services.
 
-Recommendation(s) could refer to an irrigation task that should be carried out within few hours or sometime within the next few days. This time window depends on the specific irrigation_advisor implementation standards.
+Recommendation could refer to an irrigation task that should be carried out within few hours or sometime within the next few days. This time window depends on the specific irrigation_advisor implementation standards amd crop sensitivity to water stress.
 
 There are two methods for determining whether recommendations are available: by polling the monitoring_info endpoint or by notification.
 
 <h2>9.2.1 Polling</h2>
 
-After requesting a field to be monitored, the client polls monitoring_info endpoint at regular intervals to check whether any 'recommendations' are available.
+After requesting a field to be monitored, the client polls monitoring_info endpoint at regular intervals to check whether any 'recommendation' are available.
 
 <img src="doc/monitoring_polling.png" style="width: 420px" />
 
