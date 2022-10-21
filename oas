@@ -2,11 +2,11 @@
   "openapi": "3.0.1",
   "info": {
     "title": "ATLAS irrigation_advisor Service Template API",
-    "version": "0.1.1"
+    "version": "0.1.2"
   },
   "externalDocs": {
     "description": "Service Template Document",
-    "url": "https://htmlpreview.github.io/?https://github.com/atlasH2020-templates/irrigation_advisor/blob/v0.1.1/doc.html"
+    "url": "https://htmlpreview.github.io/?https://github.com/atlasH2020-templates/irrigation_advisor/blob/v0.1.2/doc.html"
   },
   "servers": [
     {
@@ -60,11 +60,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -75,11 +70,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -89,11 +79,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -142,11 +127,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -156,11 +136,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -172,11 +147,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -186,11 +156,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -230,11 +195,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -244,11 +204,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -260,11 +215,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -274,11 +224,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -339,11 +284,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -353,11 +293,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -369,11 +304,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -383,11 +313,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -445,11 +370,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -460,11 +380,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -474,11 +389,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -518,11 +428,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -533,11 +438,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -547,11 +447,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -607,11 +502,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -622,11 +512,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
                 }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
-                }
               }
             }
           },
@@ -636,11 +521,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DetailedError"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SimpleError"
                 }
               }
             }
@@ -693,9 +573,10 @@
             ],
             "description": "status of the advice preparation"
           },
-          "configuration_url": {
+          "user_url": {
             "type": "string",
-            "description": "A 'browser URL' to a proprietary advisor UI where the user may provide additional information required to prepare the advice. A well-behaved FMIS will present his users with a visual indication and the means to click on this link when this attribute is present for advices with status CONFIGURATION_REQUIRED."
+            "format": "uri",
+            "description": "A service's proprietary UI url where the user may navigate to view additional information or be prompted for additional actions to deal with the error. A well-behaved FMIS will present his users with a visual indication and the means to click on this link when this attribute is present."
           },
           "recommendation": {
             "type": "array",
@@ -713,9 +594,9 @@
           "recommendation": {
             "type": {
               "daily": {
-               "earliest": "2021-07-30",
-               "latest": "2021-07-31",
-               "applications": 2
+                "earliest": "2021-07-30",
+                "latest": "2021-07-31",
+                "applications": 2
               }
             }
           }
@@ -770,9 +651,10 @@
             ],
             "description": "status of the advice"
           },
-          "status_message": {
+          "user_url": {
             "type": "string",
-            "description": "end-user-friendly message describing the status. In the special case where status is CONFIGURATION_REQUESTED, the message MUST be a browser URL to a configuration UI where further configuration can take place"
+            "format": "uri",
+            "description": "A 'browser URL' to a proprietary service UI where the user may view additional information or be prompted for additional inputs. A well-behaved FMIS will present his users with a visual indication and the means to click on this link when this attribute is present."
           }
         },
         "required": [
@@ -833,35 +715,38 @@
         "properties": {
           "type": {
             "description": "A definition of the recommendation type; could be daily or sub-daily",
-           "oneOf": [
-            "$ref": "#/components/schemas/Daily",
-            "$ref": "#/components/schemas/sub-Daily"
-          ]
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Daily"
+              },
+              {
+                "$ref": "#/components/schemas/sub-Daily"
+              }
+            ]
           }
         },
         "example": {
-          "recommendation":
-          {
+          "recommendation": {
             "type": {
               "daily": {
-               "earliest": "2021-07-30",
-               "latest": "2021-07-31",
-               "applications": 2
+                "earliest": "2021-07-30",
+                "latest": "2021-07-31",
+                "applications": 2
               }
             }
           }
         },
-        "required":[
+        "required": [
           "type",
           "earliest",
           "latest",
           "time"
-          ]
+        ]
       },
       "Daily": {
         "type": "object",
         "properties": {
-         "earliest": {
+          "earliest": {
             "type": "string",
             "format": "date",
             "description": "The first date of the time-window that an irrigation application should be applied."
@@ -871,19 +756,19 @@
             "format": "date",
             "description": "the last date of the time-window that an irrigation application should be applied."
           },
-         "applications": {
+          "applications": {
             "type": "integer",
             "description": "An optional parameter that refers to the number of applications an irrigation system must perform to implement an irrigation application. Usefull for irrigation_advisor services that integrate info related to irrigation systems capacity. Default is equal to 1"
           }
-       },
-       "description": "A recommedation for an irrigation application that could be applied within a time interval of 1 or more days without adverse effects for the crop",
-       "required": [
-         "earliest",
-         "latest"
-         ]
+        },
+        "description": "A recommedation for an irrigation application that could be applied within a time interval of 1 or more days without adverse effects for the crop",
+        "required": [
+          "earliest",
+          "latest"
+        ]
       },
       "sub-Daily": {
-        'type': "object",
+        "type": "object",
         "properties": {
           "time": {
             "type": "string",
@@ -891,19 +776,14 @@
             "description": "the time that an irrigation implementation task should be implemented."
           }
         },
-        "description": "A recommedation for an irrigation application that is time intensive and usually a delay of dome hours may have adverse effects on crop",
+        "description": "A recommendation for an irrigation application that is time intensive and usually a delay of dome hours may have adverse effects on crop",
         "required": [
           "time"
-          ]
+        ]
       },
       "Ratio": {
         "type": "integer",
         "description": "The percentage of the remaining daily requirements."
-      },
-      "SimpleError": {
-        "type": "string",
-        "description": "Plain text message (may be empty).",
-        "example": "optional error message"
       },
       "DetailedError": {
         "type": "object",
@@ -912,6 +792,16 @@
           "message": {
             "type": "string",
             "description": "error description"
+          },
+          "status": {
+            "type": "string",
+            "format": "number",
+            "description": "http error code"
+          },
+          "error_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "A service's proprietary UI url where the user may navigate to view additional information or be prompted for additional actions to deal with the error. A well-behaved FMIS will present his users with a visual indication and the means to click on this link when this attribute is present."
           },
           "errors": {
             "type": "array",
@@ -925,11 +815,9 @@
           "message"
         ],
         "example": {
-          "message": "general error message",
+          "message": "this is a sample error message",
           "errors": [
-            "optional",
-            "additional",
-            "details"
+            "this is an example of additional error information"
           ]
         }
       }
