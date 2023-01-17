@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "16fc1ef4-dae0-4cd6-b669-3ae1957f3fe1",
+		"name": "ATLAS irrigation_advisor",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "monitoring",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"field_urn\": \"{{field_urn}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{irrigation_advisor_url}}/monitoring",
+					"host": [
+						"{{irrigation_advisor_url}}"
+					],
+					"path": [
+						"monitoring"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "prepare_advice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"if (res.urn)",
+							"    pm.environment.set(\"advice_urn\", res.urn);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"field_urn\": \"{{field_urn}}\",\n        \"application\": {\n        \"ratio\": 40\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{irrigation_advisor_url}}/advices",
+					"host": [
+						"{{irrigation_advisor_url}}"
+					],
+					"path": [
+						"advices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_advice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{irrigation_advisor_url}}/advices/{{advice_urn}}",
+					"host": [
+						"{{irrigation_advisor_url}}"
+					],
+					"path": [
+						"advices",
+						"{{advice_urn}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_advice",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{irrigation_advisor_url}}/advices/{{advice_urn}}",
+					"host": [
+						"{{irrigation_advisor_url}}"
+					],
+					"path": [
+						"advices",
+						"{{advice_urn}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get applications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{irrigation_advisor_url}}/advices/{{advice_urn}}/applications",
+					"host": [
+						"{{irrigation_advisor_url}}"
+					],
+					"path": [
+						"advices",
+						"{{advice_urn}}",
+						"applications"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{irrigation_advisor_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
